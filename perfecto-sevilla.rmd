@@ -10,19 +10,220 @@ An article in the Journal of Sound and Vibration ["Measurement of Noise-Evoked B
 ```{r, echo= FALSE}
 bpr=c(1,0,1,2,5,1,4,6,2,3,5,4,6,8,4,5,7,9,7,6) 
 psl=c(60,63,65,70,70,70,80,90,80,80,85,89,90,90,90,90,94,100,100,100)
-BPR_PSL= data.frame(bpr,psl)
-knitr::kable(BPR_PSL)
+BPR_PSL= data.frame(psl,bpr)
+BPR_PSL
 ```
 
+***A.Draw a scatter diagram of y (blood pressure rise in millimeters of mercury) versus x (sound pressure level in decibels). Does a simple linear regression model seem reasonable in this situation?***
+
+
+
+It is reasonable to use the Linear Regression Model in analyzing this problem because the result that the research wants to answer is the relationship between the two variables--- the sound pressure levels(dB) and blood pressure rise in millimeter of mercury. 
+
+
+
+We can utilize the library of ***ggplot2*** to create an accurate regression model of the sound pressure levels(dB) and blood pressure rise in millimeter of mercury. We can do so by calling the library of ***ggplot2*** and appointing the x and y values and using the **ggplot(data=MyDataFile, aes(x,y))** function. 
 ```{r, echo=TRUE}
 library(ggplot2)
 scatterBPR_PSL=ggplot(data=BPR_PSL, aes(bpr,psl)) +   
   geom_point()
   
 scatterBPR_PSL = scatterBPR_PSL+ geom_point(size=2) +
-  xlab("Blood Pressure Rise (mmHg)") +  
-  ylab("PSL") +   
-  ggtitle("Measurement of Noise-Evoked Blood Pressure") +
-  #geom_smooth(method = "lm")
+  xlab("PSL (dB)") +  
+  ylab("Blood Pressure Rise (mmHg)") +   
+  ggtitle("Measurement of Noise-Evoked Blood Pressure") 
 scatterBPR_PSL
 ```
+
+***B. Fit the simple linear regression model using least squares. Find an estimate of σ2.***
+
+
+
+**Step 1:**
+
+
+
+To fit a simple linear regression model, we can use the equation of the fitted or estimated regression line:
+
+$$
+\hat{y} = \hat{\beta}_0 + \hat{\beta}_1x
+$$
+
+where $\hat{\beta}_0$ and $\hat{\beta}_1x$ are represented (according to the least squares) as:
+
+$$
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}
+$$
+
+$$
+\hat{\beta}_1 = \frac{S_{xx}}{S_{xy}}
+$$ 
+
+where $S_{xx} = \sum_{i = 1}^{n} x^2_i - \frac{(\sum_{i = 1}^{n} x_i)^2}{n}$, $S_{xy} = \sum_{i = 1}^{n} x_iy_i - \frac{(\sum_{i = 1}^{n} x_i)(\sum_{i = 1}^{n} y_i)}{n}$,  $\bar{y} = (1/n) \sum_{i = 1}^{n} y_i$, and $\bar{x} = (1/n) \sum_{i = 1}^{n} x_i$ 
+
+
+
+**Step 2:**
+
+
+
+Let us get the required values to solve for the linear regression line using the functions of R:
+
+
+
+The sample size:
+
+
+
+$n = 20$ ; 
+
+
+
+
+$$\sum_{i = 1}^{20} x_i = 1656$$
+
+```{r, echo = TRUE}
+sumX = sum(psl); sumX
+```
+$$\sum_{i = 1}^{20} y_i = 86$$
+```{r, echo = TRUE}
+sumY = sum(bpr); sumY
+```
+$$\bar{x} = 82.8$$
+```{r, echo = TRUE}
+barX = mean(psl); barX
+```
+$$\bar{y} = 4.3$$
+```{r, echo = TRUE}
+barY = mean(bpr); barY
+```
+$$\sum_{i = 1}^{20} x_i^2 = 140176$$
+```{r, echo = TRUE}
+sumXsqr = sum(psl^2); sumXsqr
+```
+$$\sum_{i = 1}^{20} y_i^2 = 494$$
+```{r, echo = TRUE}
+sumYsqr =sum(bpr^2); sumYsqr
+```
+
+$$\sum_{i = 1}^{20} x_1 y_i = 7654$$
+```{r, echo = TRUE}
+sumXY = sum(bpr*psl); sumXY
+```
+
+$$S_{xx} = \sum_{i = 1}^{20} x^2_i - \frac{(\sum_{i = 1}^{20} x_i)^2}{n} = 140176 - \frac{1656^2}{20}= 3059.2$$
+```{r, echo = TRUE}
+Sxx = sumXsqr- ((sumX^2)/20); Sxx
+```
+
+
+$$S_{xy} = \sum_{i = 1}^{n} x_iy_i - \frac{(\sum_{i = 1}^{n} x_i)(\sum_{i = 1}^{n} y_i)}{n} = 7654 - \frac{(1656)(86)}{20} = 533.2 $$
+
+```{r, echo = TRUE}
+Sxy = sumXY - ((sumX*sumY)/20); Sxy
+```
+
+**Step 3:**
+
+
+
+Therefore, the least squares estimates of the slope and intercepts are:
+
+
+$$
+\hat{\beta}_1 = \frac{S_{xy}}{S_{xx}} = \frac{533.2}{3059.2} = 0.1742939
+$$ 
+```{r, echo = TRUE}
+betaHat1 = Sxy/Sxx; betaHat1
+```
+
+and
+
+$$
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x} = 4.3 - (0.1742939)82.6 = -10.13154 
+$$
+
+```{r, echo = TRUE}
+betHat0 = barY - (betaHat1*barX); betHat0
+```
+
+**Step 4:**
+
+
+
+The fitted simple linear regression model (with the coefficients reported to three decimal places) is
+$$
+\hat{y} = -10.132 + 0.174x
+$$
+We can also check if our coefficients are correct by utilizing the ***coef*** function of ggplot:
+```{r}
+coeftest = lm(bpr~psl)
+coef(coeftest)
+```
+
+Here is the scatter plot with the fitted linear regression
+
+```{r, echo=FALSE}
+library(ggplot2)
+scatterBPR_PSL=ggplot(data=BPR_PSL, aes(psl,bpr)) +   
+  geom_point()
+  
+scatterBPR_PSL = scatterBPR_PSL+ geom_point(size=2) +
+  xlab("PSL (dB)") +  
+  ylab("Blood Pressure Rise (mmHg)") +   
+  ggtitle("Measurement of Noise-Evoked Blood Pressure") +
+  geom_smooth(method = "lm")
+scatterBPR_PSL
+```
+
+
+
+
+**Step 5:**
+Let us now find the estimate of $\sigma^2$:
+
+
+
+
+To find the estimate of $\sigma^2$, we need to look for the value of $SS_E$  where 
+
+
+$$SS_E = \sum_{i = 1}^{n} (y_i - \hat{y})^2$$
+We can also easily check the Squared Sum due to Errors by using the ***dataBase$resduals*** function of R:
+```{r, echo = TRUE}
+SSe = sum(scatterBPR_PSL$residuals^2); SSe
+```
+
+$$SS_E = 0
+$$
+
+finally, we can solve for $\sigma^2$ by
+
+$$
+\sigma^2 = \frac{SS_E}{n-2}
+$$
+
+Since $SS_E = 0$ that means that we can estimate $\sigma^2$ will also be equal to $0$
+
+**Interpretation:** 
+
+If $SS_E = 0$---which we can also assume that $\sigma^2 = 0$--- means that all of the observations are in the regression line and there is no residual in data given.
+
+
+
+
+***C. Find the predicted mean rise in blood pressure level associated with a sound pressure level of 85 decibels.***
+
+
+
+Since we already established the equation of the linear regression we can easily get the predicted mean rise in blood pressure level (y) associated with a sound pressure level of 85 decibels.
+
+$$
+\hat{y} = -10.132 + 0.174x = -10.132 + 0.174(85) 
+$$
+Therefore,
+$$
+\hat{y} = 4.658
+$$
+
+
