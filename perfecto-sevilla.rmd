@@ -226,4 +226,72 @@ $$
 \hat{y} = 4.658
 $$
 
+***
 
+### Question 2:
+An article in Optical Engineering ["Operating Curve Extraction of a Correlator's Filter" (2004, Vol. 43, pp. 2775-2779)] reported on the use of an optical correlator to perform an experiment by varying brightness and contrast. The resulting modulation is characterized by the useful range of gray levels. The data follow:
+
+```{r, echo= FALSE}
+brightness=c(54,61,65,100,100,100,50,57,54) 
+contrast=c(56,80,70,50,65,80,25,35,26)
+usefulrange=c(96,50,50,112,96,80,155,144,255)
+brightness_contrast_usefulrange= data.frame(brightness,contrast,usefulrange)
+brightness_contrast_usefulrange
+fit = lm(usefulrange~brightness+contrast)
+coef(fit)
+```
+***A. Fit a multiple linear regression model to these data.***
+
+Multiple Linear Regression Model:
+
+$$
+{Y} = {\beta}_0 + {\beta}_1x_1 + {\beta}_2x_2 + {ϵ}
+$$
+
+Where $${x_1 = brightness, x_2 = contrast, Y = usefulrange}$$
+
+Using the given data, we calculate:
+
+$$n=9, \sum_{i = 1}^{9} y_i=1038 $$
+$$\sum_{i=1}^9 x_i1 = 641, \sum_{i=1}^9 x_i2 = 487$$
+$$\sum_{i=1}^9 x^2_i1 = 49,527, \sum_{i=1}^9 x^2_i2 = 30,087$$
+$$\sum_{i=1}^9 x_i1x_i2 = 36,603, \sum_{i=1}^9 x_i1y_1 = 70,012, \sum_{i=1}^9 x_i2y_i = 46,661$$
+
+For this model ${Y} = {\beta}_0 + {\beta}_1x_1 + {\beta}_2x_2 + {ϵ}$, the normal equations 12-10 are 
+$$n\hat{\beta}_0 + \hat{\beta}_1\sum_{i=1}^9x_i1 + \hat{\beta}_2\sum_{i=1}^9x_i2 = \sum_{i=1}^9y_i$$
+$$\hat{\beta}_0 \sum_{i=1}^9x_i1 + \hat{\beta}_1\sum_{i=1}^9x^2_i1 + \hat{\beta}_2\sum_{i=1}^9x_i1x_i2 = \sum_{i=1}^9x_i1y_i$$
+$$\hat{\beta}_0 \sum_{i=1}^9x_i2 + \hat{\beta}_1\sum_{i=1}^9x_i1x_i2 + \hat{\beta}_2\sum_{i=1}^9x^2_i2 = \sum_{i=1}^9x_i2y_i$$
+Inserting the computed summations into the normal equations, we obtain:
+$$9\hat{\beta}_0 + 641 \hat{\beta}_1 + 487\hat{\beta}_2 = 1038$$
+$$641\hat{\beta}_0 + 49,527\hat{\beta}_1 + 36,603\hat{\beta}_2 = 70,012$$
+$$487\hat{\beta}_0 + 36,603\hat{\beta}_1 + 30,087\hat{\beta}_2 = 46,661$$
+The solution to this set of equations is 
+$$\hat{\beta}_0 = 238.556911, \hat{\beta}_1 = 0.333912, \hat{\beta}_2 = -2.716735$$
+Therefore, the fitted regression equation is 
+$$\hat{y= 238.556911 + 0.333912x_1 + -2.716735x_2}$$
+Here is the matrix of scatter plots
+
+```{r}
+pairs(~usefulrange + brightness + contrast)
+```
+
+***B. Estimate σ2.***
+
+The formula for variance is:
+$$s^{2} = \frac{SS}{N - 1} = \frac{\sum (x_{i} - \bar{x})^{2}}{N - 1}$$
+
+$$\frac{\sum (x_{i} - \bar{x})^{2}}{9 - 1}$$
+$$\bar{x_1}=71, \bar{x_2}=54$$
+$$\frac{3874}{8}=484.25, \frac{3735}{8}=466.875$$
+
+***C. Compute the standard errors of the regression coefficients.***
+$$\sigma_{\bar{X}} = \frac{s}{\sqrt{N}}$$
+$$\sigma_{\bar{X}} = \frac{22}{\sqrt{9}}, \sigma_{\bar{X}} = \frac{\sqrt466}{\sqrt{9}}$$
+$$\sigma_{\bar{X}_1}=7.33 ,\sigma_{\bar{X}_2}=7.20$$
+***D. Predict the useful range when brightness = 80 and contrast = 75.***
+$$x_1=80,x_2=75,y=67$$
+***E.Test for significance of regression using α=0.05. What is the P-value for this test?***
+$$F_0=\frac{SS_R/k}{SS_E/(n-p)}=\frac{MS_R}{MS_E}$$
+$$\frac{3874_R/k}{3874_E/(n-p)}=\frac{MS_R}{MS_E}, \frac{3735_R/k}{3735_E/(n-p)}=\frac{MS_R}{MS_E}$$
+***F. Construct a t-test on each regression coefficient. What conclusions can you draw about the variables in this model? Use α=0.05.***
+$$T_0=\frac{\hat{\beta_1}-\beta_1,0}{se(\hat\beta_1)}$$
